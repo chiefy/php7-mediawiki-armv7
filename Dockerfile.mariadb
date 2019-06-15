@@ -1,0 +1,39 @@
+FROM arm32v7/alpine:latest
+
+ARG DB_DATA_PATH
+ARG DB_ROOT_PASS
+ARG DB_USER
+ARG DB_PASS
+ARG DATABASE
+
+RUN \
+    apk update \
+    && apk add \
+    mariadb \
+    mariadb-client \
+    && sed -i 's/^#\(bind-address\)/\1/' /etc/my.cnf.d/mariadb-server.cnf \
+    && mysql_install_db --user=mysql --datadir=${DB_DATA_PATH} \
+    && echo "mysqld_safe &" > /tmp/cmd \
+    && /bin/ash /tmp/cmd \
+    && sleep 20 \ 
+    && mysqladmin -u root password "${DB_ROOT_PASS}" \
+    && echo "GRANT ALL ON *.* TO ${DB_USER}@'%' IDENTIFIED BY '${DB_PASS}' WITH GRANT OPTION;" >> /tmp/sql \
+    && echo "DELETE FROM mysql.user WHERE User='';" >> /tmp/sql \
+    && echo "DROP DATABASE test;" >> /tmp/sql \ 
+    && echo "FLUSH PRIVILEGES;" >> /tmp/sql \
+    && echo "CREATE DATABASE ${DATABASE};" >> /tmp/sql \
+    && cat /tmp/sql | mysql -u root --password="${DB_ROOT_PASS}" \
+    && rm /tmp/sql /tmp/cmd
+
+# Define mountable directories.
+VOLUME ["/etc/mysql", "/var/lib/mysql"]
+
+# Define working directory.
+WORKDIR /usr/data
+
+# Define default command.
+CMD [ "mysqld_safe", "--skip_networking=0" ]
+
+# Expose ports.
+EXPOSE 3306
+

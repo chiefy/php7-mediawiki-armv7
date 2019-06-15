@@ -1,0 +1,67 @@
+version: '3.7'
+
+services:
+
+  mediawiki:
+      build: .
+      container_name: mediawiki
+      env_file: .env
+      volumes:
+        - "mediawiki:/var/www/mediawiki"
+        - "images:/var/www/mediawiki/images"
+        - "./conf/LocalSettings.php:/var/www/mediawiki/LocalSettings.php:ro"
+
+  nginx:
+      image: arm32v7/nginx:stable
+      env_file: .env
+      container_name: nginx
+      volumes:
+        - "./nginx.conf:/etc/nginx/nginx.conf"
+        - "mediawiki:/var/www/mediawiki"
+      depends_on: 
+        - mediawiki
+      ports:
+        - "8080:80"
+
+  db_sync:
+      env_file: .env
+      container_name: db_sync
+      build:
+         context: .
+         dockerfile: Dockerfile.utils 
+      volumes:
+         - "./scripts/restore_db.sh:/usr/local/bin/sync"
+      command:
+         - "sync"
+
+  image_sync:
+      env_file: .env
+      container_name: image_sync
+      build:
+           context: .
+           dockerfile: Dockerfile.utils
+      volumes:
+          - "./scripts/sync_s3.sh:/usr/local/bin/sync"
+          - "images:/images"
+      command:
+          - "sync"
+          - "${S3_IMAGE_BUCKET}/${S3_IMAGE_BUCKET_KEY}"
+          - "/images"
+  
+  db:
+      env_file: .env
+      container_name: db
+      build:
+        context: .
+        dockerfile: Dockerfile.mariadb
+        args:
+          - "DB_DATA_PATH=/var/lib/mysql"
+          - "DB_USER=${DB_USER}"
+          - "DB_PASS=${DB_PASS}"
+          - "DATABASE=${DATABASE}"
+          - "DB_ROOT_PASS=${DB_ROOT_PASS}"
+
+volumes:
+  mediawiki:
+  images:
+  dbrestore:
