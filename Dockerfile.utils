@@ -1,5 +1,8 @@
 FROM arm32v7/alpine:latest
 
+ARG SCHEDULE
+ARG CRON_SCRIPT
+
 RUN \
 	apk update \
 	&& apk add \
@@ -10,5 +13,6 @@ RUN \
 	&& pip3 install --upgrade pip \
 	&& pip3 install awscli
 
-ENTRYPOINT [ "/bin/bash" ]
+COPY etc/crontab/root /etc/crontab/root
 
+RUN echo "${SCHEDULE} ${CRON_SCRIPT} 2>&1" >> /etc/crontab/root

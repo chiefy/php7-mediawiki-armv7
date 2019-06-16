@@ -23,16 +23,19 @@ services:
       ports:
         - "8080:80"
 
-  db_sync:
+  db_backup:
       env_file: .env
-      container_name: db_sync
+      container_name: db_backup
       build:
          context: .
          dockerfile: Dockerfile.utils 
+         args:
+           - "SCHEDULE=${DB_BACKUP_SCHEDULE}"
+           - "CRON_SCRIPT='utils backup'"
       volumes:
-         - "./scripts/restore_db.sh:/usr/local/bin/sync"
+         - "./scripts/db_utils_entrypoint.sh:/usr/local/bin/utils"
       command:
-         - "sync"
+         - "utils start"
 
   image_sync:
       env_file: .env
