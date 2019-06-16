@@ -32,8 +32,8 @@ restore() {
     return
   fi
   aws s3 cp ${S3_DB_BUCKET}/${S3_DB_BUCKET_KEY}/${S3_DB_BUCKET_BACKUP_NAME} ${backup}.gz
-  gunzip ${backup}.gz
-  while !$(nc -z db 3306); do
+  gunzip -f ${backup}.gz
+  until $(nc -z db 3306); do
     echo "Waiting for mariadb on 3306..."
     sleep 5
   done
