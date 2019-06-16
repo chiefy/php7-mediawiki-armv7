@@ -13,6 +13,6 @@ RUN \
 	&& pip3 install --upgrade pip \
 	&& pip3 install awscli
 
-COPY etc/crontab/root /etc/crontab/root
+COPY etc/crontabs/root /etc/crontabs/root
 
-RUN echo "${SCHEDULE} ${CRON_SCRIPT} 2>&1" >> /etc/crontab/root
+RUN echo "${SCHEDULE} ${CRON_SCRIPT} 2>&1" >> /etc/crontabs/root

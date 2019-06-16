@@ -1,4 +1,4 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
@@ -7,6 +7,7 @@ DEBUG=${DEBUG:-""}
 
 # Only restore DB once
 RESTORED_BIT=/root/.dbrestored
+RESTORE_DB=${RESTORE_DB:-0}
 
 # Default backup to every 12 hours
 DB_RESTORE_SCHEDULE=${DB_RESTORE_SCHEDULE:-"* */12 * * *"}
@@ -20,9 +21,10 @@ if [[ -z ${AWS_ACCESS_KEY_ID} || -z ${AWS_SECRET_ACCESS_KEY} ]]; then
 fi
 
 restore() {
-  local backup= /tmp/backup.sql
-  if [[ ! -z ${RESTORE_DB} ]]; then
-    echo "RESTORE_DB env not set, not restoring db"
+  local backup=/tmp/backup.sql
+  if [[ -z ${RESTORE_DB} || ${RESTORE_DB} -ne 1 ]]; then
+    echo ${RESTORE_DB}
+    echo "RESTORE_DB env not set to 1, not restoring db"
     return
   fi
   if [[ -f ${RESTORED_BIT} ]]; then
@@ -40,11 +42,11 @@ backup() {
   local backup=$(date +%Y-%m-%d-%H%M%S).sql.gz
   cd /tmp
   mysqldump --add-drop-table -hdb -p${DB_PASS} -u${DB_USER} ${DATABASE} | gzip >${backup}
-  aws s3 cp ${backup} ${S3_DB_BUCKET}/${S3_DB_BUCKET_KEY}
+  aws s3 cp ${backup} ${S3_DB_BUCKET}/${S3_DB_BUCKET_KEY}/${backup}
   rm -f ${backup}
 }
 
-start() {
+startup() {
   restore
   echo "Starting crond..."
   crond -f -l 2

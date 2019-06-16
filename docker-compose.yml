@@ -32,12 +32,12 @@ services:
          dockerfile: Dockerfile.utils 
          args:
            - "SCHEDULE=${DB_BACKUP_SCHEDULE}"
-           - "CRON_SCRIPT='/usr/local/bin/utils backup'"
+           - "CRON_SCRIPT=/usr/local/bin/db_utils backup"
       volumes:
-         - "./scripts/db_utils_entrypoint.sh:/usr/local/bin/utils"
+        - "./scripts/db_utils_entrypoint.sh:/usr/local/bin/db_utils"
       command:
-         - "/usr/local/bin/utils" 
-         - "start"
+        - "/usr/local/bin/db_utils"
+        - "startup"
 
   image_sync:
       env_file: .env
@@ -46,7 +46,7 @@ services:
            context: .
            dockerfile: Dockerfile.utils
       volumes:
-          - "./scripts/sync_s3.sh:/usr/local/bin/sync"
+          - "./scripts/image_sync_entrypoint.sh:/usr/local/bin/sync"
           - "images:/images"
       command:
           - "sync"
