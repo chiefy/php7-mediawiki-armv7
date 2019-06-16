@@ -67,4 +67,3 @@ WORKDIR /var/www/mediawiki
 EXPOSE 9000
 
 ENTRYPOINT ["php-fpm7", "-F"]
-
