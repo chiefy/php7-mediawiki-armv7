@@ -16,6 +16,7 @@ RUN \
     php7-phar \
     php7-zip \
     php7-xml \
+    php7-xmlreader \
     php7-ctype \
     php7-iconv \
     php7-common \

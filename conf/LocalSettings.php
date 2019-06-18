@@ -14,7 +14,10 @@
 if ( !defined( 'MEDIAWIKI' ) ) {
 	exit;
 }
-
+error_reporting( -1 );
+ini_set( 'display_errors', 1 );
+$wgShowExceptionDetails = true;
+$wgShowDBErrorBacktrace = true;
 
 ## Uncomment this to disable output compression
 # $wgDisableOutputCompression = true;
