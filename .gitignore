@@ -1,2 +1,3 @@
 .env
 etc/nginx/.htpasswd
+acmeout

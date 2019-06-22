@@ -4,22 +4,29 @@ ENV \
     MW_VERSION=1.32 \
     MW_PATCH_VERSION=1 
 
+ARG MW_EXTENSIONS
+
 RUN \
     apk update \
     && apk add \
     curl \
     tar \
+    bash \
     diffutils \
     git \
+    jq \
     php7 \
     php7-bz2 \
     php7-phar \
     php7-zip \
     php7-xml \
     php7-xmlreader \
+    php7-xmlwriter \
+    php7-simplexml \
     php7-ctype \
     php7-iconv \
     php7-common \
+    php7-tokenizer \
     php7-mysqli \
     php7-fpm \
     php7-gd \
@@ -60,10 +67,20 @@ RUN \
     # forward logs to docker log collector
     && ln -sf /dev/stderr /var/log/php7/error.log
 
-
 USER www
 
 WORKDIR /var/www/mediawiki
+
+# Composer installable extensions
+COPY conf/composer.local.json .
+
+# extensions.json is json list of non-composer installable mediawiki extensions
+COPY conf/extensions.json .
+COPY scripts/install_extensions.sh .
+
+# Install mw extensions
+RUN /usr/local/bin/composer update --no-dev;
+RUN ./install_extensions.sh && rm install_extensions.sh extensions.json
 
 EXPOSE 9000
 

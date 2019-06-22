@@ -14,10 +14,10 @@
 if ( !defined( 'MEDIAWIKI' ) ) {
 	exit;
 }
-error_reporting( -1 );
-ini_set( 'display_errors', 1 );
-$wgShowExceptionDetails = true;
-$wgShowDBErrorBacktrace = true;
+# error_reporting( -1 );
+# ini_set( 'display_errors', 1 );
+# $wgShowExceptionDetails = true;
+# $wgShowDBErrorBacktrace = true;
 
 ## Uncomment this to disable output compression
 # $wgDisableOutputCompression = true;
@@ -130,3 +130,17 @@ wfLoadSkin( 'Vector' );
 
 # End of automatically generated settings.
 # Add more configuration options below.
+
+## Maps
+wfLoadExtension( 'Maps' );
+require_once __DIR__ . '/extensions/Maps/DefaultSettings.php';
+$egMapsDefaultService = 'leaflet';
+
+wfLoadExtension( 'MobileFrontend' );
+$wgMFAutodetectMobileView = true;
+
+wfLoadExtension( 'YouTube' );
+
+wfLoadExtension( 'RandomImage' );
+
+wfLoadExtension( 'MsUpload' );

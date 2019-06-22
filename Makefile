@@ -10,11 +10,11 @@ build:
 
 .PHONY: up
 up: ./etc/nginx/.htpasswd .env
-	@docker-compose -p $(PROJECT_NAME) up -d
+	@docker-compose -p $(PROJECT_NAME) up --force-recreate -d
 
 .PHONY: stop
 stop:
 	@docker-compose -p $(PROJECT_NAME) stop; docker-compose -p $(PROJECT_NAME) rm -fv
 
-./etc/nginx/.htpasswd:
+etc/nginx/.htpasswd:
 	@echo "$(MW_SITE_BASIC_AUTH_USER):$(shell echo $(MW_SITE_BASIC_AUTH_PASS) | openssl passwd -stdin -noverify)" > $@

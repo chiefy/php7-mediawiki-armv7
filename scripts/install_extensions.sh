@@ -2,13 +2,15 @@
 
 set -eou pipefail
 
-declare -A MW_EXTENSIONS
+ext_dir=${EXT_DIR:-extensions}
+ext_file=${1:-./extensions.json}
 
-: ${EXT_DIR:-extensions}
-: ${MW_EXTENSIONS:-""}
+if [[ ! -d ${ext_dir} ]]; then 
+  mkdir ${ext_dir}
+fi
 
-for ext_url in ${MW_EXTENSIONS[@]}; do
+for ext_url in $(cat ${ext_file} | jq -r '.[]'); do
   echo "Downloading ${ext_url}"
-  wget -qO - $ext_url | tar -C ${EXT_DIR} -xz
+  curl -Ls $ext_url | tar -C ${ext_dir} -xz
   echo "Done downloading ${ext_url}"
 done
